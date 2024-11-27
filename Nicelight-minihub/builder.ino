@@ -10,29 +10,36 @@ void build(sets::Builder& b) {
   }
 
   // группа. beginGroup всегда вернёт true для удобства организации кода
-  if (b.beginGroup("Время и все такое")) {
-    b.Date(kk::date, "Date");
-    b.Time(kk::t1f1_startTime, "Рассвет");
+  {
+    sets::Group g(b, "Nicelight");
+
+    //  if (b.beginGroup("Nicelight")) {
     b.Time(kk::secondsNow, "Вермечко");
     //    b.Time("", &data.secondsNow);// так было
 
-
-    b.DateTime(kk::datime, "Datime");
-    b.endGroup();  // НЕ ЗАБЫВАЕМ ЗАВЕРШИТЬ ГРУППУ
+    //    b.endGroup();  // обязательно
   }
 
-  // пара лейблов вне группы. Так тоже можно
-  b.Label(kk::lbl1, "lable1");
-  b.Label(kk::lbl2, "millis()", "", sets::Colors::Red);
-
+  // вне группы. Так тоже можно
+  b.Switch(kk::toggle, "тыр-тырка");
+  
+  {
+    sets::Group g(b, "Основное освещение");
+    b.Time(kk::t1f1_startTime, "Рассвет");
+  }
   // ещё группа
   // можно использовать такой синтаксис: sets::Group(Builder&, title) заключается в блок кода в самом начале,
   // вызывать endGroup в этом случае не нужно
   // так же работают остальные контейнеры (Menu, Buttons)
   {
-    sets::Group g(b, "Group 2");
+    sets::Group g(b, "Group 3");
+    b.Label(kk::lbl1, "lable1");
+    b.Label(kk::lbl2, "millis()", "", sets::Colors::Red);
+    b.Date(kk::date, "Date");
+    b.DateTime(kk::datime, "Datime");
+
     b.Color(kk::color, "Color");
-    b.Switch(kk::toggle, "Switch");
+//    b.Switch(kk::toggle2, "Switch");
     b.Select(kk::selectw, "Select", "var1;var2;hello");
     b.Slider(kk::slider, "Slider", -10, 10, 0.5, "deg");
   }
