@@ -3,10 +3,14 @@
 
 // имя пароль вашей домашней сети
 // можно ввести, подключившись к ESP AP c паролем 1234567890
-#define WIFI "" 
+#define WIFI ""
 #define WIFIPASS ""
-#include <Arduino.h>
+#define INDIKATOR 2         // на каком пине индикаторный светодиод
 
+
+
+
+#include <Arduino.h>
 #include "timer.h"
 #include "led.h"
 #ifdef ESP8266
@@ -107,6 +111,8 @@ Data data;
 
 Timer each60Sec(60000); // таймер раз в минуту
 
+LED indikator(INDIKATOR, 300, 3, 50, 20); //каждые 1000 милисек мигаем 3 раза каждых 50 мс, время горения 20 мсек
+
 
 
 // билдер! Тут строится наше окно настроек
@@ -154,10 +160,13 @@ void setup() {
   WiFiConnector.onConnect([]() {
     Serial.print("Connected! ");
     Serial.println(WiFi.localIP());
+    indikator.setPeriod(3000, 1, 200, 150); //раз в 000 сек, 0 раз взмигнем - по 00 милисек периоды, гореть будем 0 милисек
   });
   WiFiConnector.onError([]() {
     Serial.print("Error! start AP ");
     Serial.println(WiFi.softAPIP());
+    indikator.setPeriod(600, 2, 100, 50); //раз в  секунду два раза взмигнем - по 200 милисек, гореть будем 50 милисек
+
   });
 
   WiFiConnector.connect(db[kk::wifi_ssid], db[kk::wifi_pass]);
@@ -171,6 +180,8 @@ void loop() {
   WiFiConnector.tick(); // поддержка wifi связи
   sett.tick();  // поддержка веб интерфейса
   NTP.tick(); // поддержка NTP
+  indikator.tick(); // in loop
+
   if (each60Sec.ready()) { // раз в минуту
     if (!NTP.status() && NTP.synced()) {
       // берем текущую дату и время
