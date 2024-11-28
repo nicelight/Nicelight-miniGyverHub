@@ -6,6 +6,10 @@
 #define WIFI ""
 #define WIFIPASS ""
 #define INDIKATOR 2         // на каком пине индикаторный светодиод
+#define RELE_1 13
+#define RELE_2 14
+#define ON 0 //включение релюшек логическим нулем или единицей
+#define OFF 1
 
 
 
@@ -152,29 +156,34 @@ void setup() {
 
   NTP.begin(5); // часовой пояс. Для Москвы: 3. Худжанд, Нск 5. Обновляться раз в 600 сек
   NTP.setPeriod(600); // обновлять раз в 600 сек
+pinMode(RELE_1, OUTPUT);
+digitalWrite(RELE_1, OFF);
+pinMode(RELE_2, OUTPUT);
+digitalWrite(RELE_2, OFF);
 
 }//setup
 
 
 void loop() {
   WiFiConnector.tick(); // поддержка wifi связи
+//  NTP.tick(); // поддержка NTP
   sett.tick();  // поддержка веб интерфейса
-  NTP.tick(); // поддержка NTP
   indikator.tick(); // in loop
 
   if (each60Sec.ready()) { // раз в минуту
+  NTP.tick(); // поддержка NTP
     if (!NTP.status() && NTP.synced()) {
       // берем текущую дату и время
       //db[kk::t1f1_startTime] =  //тут хранится время
       //    nowTime.set(ntp.hour(), ntp.minute(), ntp.second());
       //    nowDate.set(ntp.year(), ntp.month(), ntp.day());
       data.secondsNow = NTP.daySeconds();
-    } else Serial.print("NTP discon");
+    } else Serial.print("\n\n\tNTP discon\n\n");
 
   }//each60Sec
 
   if (NTP.newSecond()) {
-    if(--initially)       data.secondsNow = NTP.daySeconds(); // вначале схватываем время с ntp
+    if(initially--)       data.secondsNow = NTP.daySeconds(); // вначале схватываем время с ntp
     data.secondsNow++;
   }
 }//loop
